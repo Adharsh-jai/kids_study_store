@@ -14,6 +14,6 @@ jobs:
         with:
           username: ${{ secrets.docker_username }}
           password: ${{ secrets.docker_password }}
-      - name: Check Docker Login
+      - name: Checks Docker Login
         run: docker info
      
