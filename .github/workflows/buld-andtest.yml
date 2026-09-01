@@ -9,11 +9,16 @@ jobs:
     steps: 
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: docker frontend build
+        run: docker run -d --name luxe-nginx -p 80:80 -v "${PWD}:/usr/share/nginx/html" nginx
+      - name: container checking 
+        run: docker ps
       - name: docker login
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.docker_username }}
           password: ${{ secrets.docker_password }}
-      - name: Checks Docker Login
+      - name: Checking Docker Login
         run: docker info
+      
      
