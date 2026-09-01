@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Spin & Study Tracker</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Quicksand:wght@500;600&family=Rubik:wght@700&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-primary": "#ffffff",
+            "tertiary-fixed-dim": "#7bdb85",
+            "secondary-container": "#4c96fe",
+            "secondary": "#005db8",
+            "surface-container-low": "#f3f3f3",
+            "surface-variant": "#e2e2e2",
+            "primary-container": "#ffd93d",
+            "primary-fixed-dim": "#e8c426",
+            "on-error-container": "#93000a",
+            "on-primary-fixed-variant": "#554500",
+            "on-primary-container": "#725e00",
+            "surface-bright": "#f9f9f9",
+            "surface-container": "#eeeeee",
+            "on-secondary-fixed-variant": "#00468c",
+            "error": "#ba1a1a",
+            "tertiary-container": "#8ff199",
+            "on-background": "#1a1c1c",
+            "surface-container-high": "#e8e8e8",
+            "secondary-fixed": "#d6e3ff",
+            "outline-variant": "#d0c6ad",
+            "inverse-on-surface": "#f1f1f1",
+            "surface-container-highest": "#e2e2e2",
+            "secondary-fixed-dim": "#a9c7ff",
+            "tertiary": "#006e29",
+            "surface": "#f9f9f9",
+            "on-primary-fixed": "#221b00",
+            "on-surface-variant": "#4d4633",
+            "on-tertiary-fixed": "#002107",
+            "primary-fixed": "#ffe173",
+            "on-secondary-container": "#002e60",
+            "on-tertiary": "#ffffff",
+            "tertiary-fixed": "#96f89f",
+            "on-secondary-fixed": "#001b3e",
+            "error-container": "#ffdad6",
+            "on-error": "#ffffff",
+            "outline": "#7e7761",
+            "inverse-surface": "#2f3131",
+            "on-secondary": "#ffffff",
+            "inverse-primary": "#e8c426",
+            "surface-dim": "#dadada",
+            "on-surface": "#1a1c1c",
+            "surface-tint": "#705d00",
+            "background": "#f9f9f9",
+            "on-tertiary-container": "#00702a",
+            "on-tertiary-fixed-variant": "#00531d",
+            "primary": "#705d00",
+            "surface-container-lowest": "#ffffff"
+          },
+          borderRadius: {
+            DEFAULT: "1rem",
+            lg: "2rem",
+            xl: "3rem",
+            full: "9999px"
+          },
+          spacing: {
+            gutter: "16px",
+            unit: "8px",
+            "container-padding": "24px",
+            "stack-gap": "20px"
+          },
+          fontFamily: {
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "label-bold": ["Rubik"],
+            "body-md": ["Quicksand"],
+            "body-lg": ["Quicksand"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "display-lg": ["Plus Jakarta Sans"]
+          },
+          fontSize: {
+            "headline-lg-mobile": ["28px", { lineHeight: "36px", fontWeight: "700" }],
+            "label-bold": ["16px", { lineHeight: "20px", fontWeight: "700" }],
+            "body-md": ["18px", { lineHeight: "28px", fontWeight: "500" }],
+            "body-lg": ["20px", { lineHeight: "30px", fontWeight: "600" }],
+            "headline-lg": ["32px", { lineHeight: "40px", fontWeight: "700" }],
+            "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-1px", fontWeight: "800" }]
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #f9f9f9;
+      color: #1a1c1c;
+      font-family: 'Quicksand', sans-serif;
+      min-height: 100dvh;
+    }
+
+    .bubbly-button {
+      box-shadow: 0 4px 0 0 rgba(0, 0, 0, 0.15);
+      transition: all 0.1s ease;
+    }
+
+    .bubbly-button:active {
+      transform: translateY(4px) scale(0.98);
+      box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+    }
+
+    .bubbly-card {
+      box-shadow: 0 8px 0 0 rgba(0, 0, 0, 0.05);
+      transition: all 0.2s ease-in-out;
+    }
+
+    .bubbly-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 0 0 rgba(0, 0, 0, 0.06);
+    }
+
+    .fab {
+      box-shadow: 0 6px 0 0 #725e00;
+    }
+
+    .fab:active {
+      box-shadow: 0 0 0 0 #725e00;
+      transform: translateY(6px);
+    }
+
+    /* Wheel */
+    .wheel-container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 0 auto;
+      border-radius: 50%;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), inset 0 0 0 12px #fff;
+      overflow: hidden;
+      transition: transform 3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      background: conic-gradient(#4c96fe 0deg 60deg, #ffd93d 60deg 120deg, #8ff199 120deg 180deg, #ffdad6 180deg 240deg, #7bdb85 240deg 300deg, #a9c7ff 300deg 360deg);
+    }
+
+    .wheel-pointer {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 18px solid transparent;
+      border-right: 18px solid transparent;
+      border-top: 28px solid #ba1a1a;
+      z-index: 10;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+    }
+
+    .segment-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform-origin: 0 0;
+      font-family: 'Rubik', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      color: #1a1c1c;
+      text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.8);
+      width: 130px;
+      text-align: right;
+      padding-right: 16px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .seg-0 {
+      transform: translate(0, -50%) rotate(30deg);
+      color: #fff;
+      text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+    }
+
+    .seg-1 {
+      transform: translate(0, -50%) rotate(90deg);
+    }
+
+    .seg-2 {
+      transform: translate(0, -50%) rotate(150deg);
+      color: #fff;
+      text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+    }
+
+    .seg-3 {
+      transform: translate(0, -50%) rotate(210deg);
+    }
+
+    .seg-4 {
+      transform: translate(0, -50%) rotate(270deg);
+      color: #fff;
+      text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+    }
+
+    .seg-5 {
+      transform: translate(0, -50%) rotate(330deg);
+    }
+
+    .spinning {
+      animation: pulse-border 0.5s infinite alternate;
+    }
+
+    @keyframes pulse-border {
+      from {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), inset 0 0 0 12px #fff;
+      }
+
+      to {
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), inset 0 0 0 8px #fff;
+      }
+    }
+
+    /* Timer */
+    .timer-progress {
+      stroke-dasharray: 880;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 1s linear;
+    }
+
+    /* Page switching */
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Nav active */
+    .nav-item.active-nav {
+      background-color: #ffd93d;
+      color: #725e00;
+      border-radius: 0.75rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    /* Confetti bg */
+    .confetti-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        radial-gradient(circle at 20% 30%, #ffd93d 4px, transparent 5px),
+        radial-gradient(circle at 80% 20%, #4c96fe 6px, transparent 7px),
+        radial-gradient(circle at 40% 70%, #8ff199 5px, transparent 6px),
+        radial-gradient(circle at 70% 80%, #ffdad6 7px, transparent 8px),
+        radial-gradient(circle at 10% 80%, #7bdb85 4px, transparent 5px),
+        radial-gradient(circle at 90% 50%, #e8c426 6px, transparent 7px);
+      opacity: 0.5;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: #fff;
+      border-radius: 1.5rem;
+      padding: 1.75rem;
+      width: 100%;
+      max-width: 460px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2);
+      animation: popIn .25s ease;
+      border: 4px solid #e2e2e2;
+    }
+
+    @keyframes popIn {
+      from {
+        transform: scale(.88);
+        opacity: 0
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1
+      }
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 6rem;
+      right: 1.5rem;
+      background: #1a1c1c;
+      color: #fff;
+      padding: .65rem 1.25rem;
+      border-radius: 9999px;
+      font-family: 'Rubik', sans-serif;
+      font-size: .88rem;
+      font-weight: 700;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .2);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity .3s, transform .3s;
+      z-index: 999;
+      pointer-events: none;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Checkbox pop */
+    .check-animate {
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .check-animate.checked {
+      background-color: #006e29;
+      transform: scale(1.2);
+    }
+
+    /* Progress bar */
+    .prog-bar {
+      height: 1rem;
+      background: #e2e2e2;
+      border-radius: 9999px;
+      overflow: hidden;
+      border: 2px solid #e8e8e8;
+    }
+
+    .prog-fill {
+      height: 100%;
+      border-radius: 9999px;
+      position: relative;
+      transition: width 0.5s ease;
+    }
+
+    .prog-fill::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 1rem;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 9999px;
+    }
+
+    /* Card border colors */
+    .border-subj-0 {
+      border-color: #d6e3ff;
+    }
+
+    .border-subj-1 {
+      border-color: #8ff199;
+    }
+
+    .border-subj-2 {
+      border-color: #ffd93d;
+    }
+
+    .border-subj-3 {
+      border-color: #ffdad6;
+    }
+
+    .border-subj-4 {
+      border-color: #a9c7ff;
+    }
+
+    .prog-subj-0 {
+      background-color: #4c96fe;
+    }
+
+    .prog-subj-1 {
+      background-color: #8ff199;
+    }
+
+    .prog-subj-2 {
+      background-color: #ffd93d;
+    }
+
+    .prog-subj-3 {
+      background-color: #ffdad6;
+    }
+
+    .prog-subj-4 {
+      background-color: #a9c7ff;
+    }
+
+    .icon-subj-0 {
+      background-color: #d6e3ff;
+      color: #005db8;
+    }
+
+    .icon-subj-1 {
+      background-color: #8ff199;
+      color: #006e29;
+    }
+
+    .icon-subj-2 {
+      background-color: #ffe173;
+      color: #705d00;
+    }
+
+    .icon-subj-3 {
+      background-color: #ffdad6;
+      color: #ba1a1a;
+    }
+
+    .icon-subj-4 {
+      background-color: #a9c7ff;
+      color: #00468c;
+    }
+
+    /* Status chips */
+    .chip-Completed {
+      background: #8ff199;
+      color: #006e29;
+    }
+
+    .chip-InProgress {
+      background: #d6e3ff;
+      color: #005db8;
+    }
+
+    .chip-Pending {
+      background: #ffe173;
+      color: #725e00;
+    }
+
+    /* Responsive fix for table on mobile */
+    @media (max-width: 640px) {
+      .hide-mobile {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col pb-20">
+
+  <div class="confetti-bg"></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+     TOP APP BAR
+══════════════════════════════════════════════════════════ -->
+  <header class="w-full top-0 sticky bg-surface-bright shadow-[0_4px_0_0_rgba(0,0,0,0.05)] z-40">
+    <div class="flex justify-between items-center px-gutter py-unit w-full max-w-4xl mx-auto">
+      <div class="flex items-center gap-3">
+        <div
+          class="w-11 h-11 rounded-full border-4 border-primary-container bg-tertiary-fixed flex items-center justify-center text-2xl flex-shrink-0">
+          🎓</div>
+        <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary tracking-tight">Study Buddy</h1>
+      </div>
+      <div id="headerRight" class="text-on-surface-variant font-label-bold text-sm"></div>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════
+     PAGE 1 – HOME (Welcome / Stats)
+══════════════════════════════════════════════════════════ -->
+  <main id="page-home"
+    class="page active flex-grow w-full max-w-4xl mx-auto px-container-padding py-stack-gap relative z-10">
+
+    <!-- Greeting card -->
+    <div
+      class="bg-surface-container-lowest rounded-xl border-4 border-surface-variant p-6 relative overflow-hidden mb-stack-gap shadow-[0_8px_24px_rgba(0,0,0,0.07)]">
+      <div class="absolute -top-8 -right-8 w-28 h-28 bg-primary-fixed rounded-full opacity-50"></div>
+      <div class="absolute -bottom-12 -left-12 w-40 h-40 bg-secondary-fixed rounded-full opacity-40"></div>
+      <div class="relative z-10">
+        <p class="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider mb-1">Good day,
+          Scholar! 🌟</p>
+        <h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Ready to learn today?</h2>
+        <p class="font-body-md text-body-md text-on-surface-variant">Track your sessions, spin the wheel, and crush your
+          goals!</p>
+        <button onclick="navigate('sessions')"
+          class="bubbly-button mt-4 bg-primary-container text-on-primary-container font-label-bold text-label-bold px-6 py-3 rounded-full flex items-center gap-2 hover:opacity-90 transition-opacity">
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">add_circle</span> Add Study
+          Session
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats grid -->
+    <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-3">Your Progress 📊</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-stack-gap">
+      <div class="bg-surface-container-lowest rounded-xl border-4 border-primary-container p-4 text-center shadow-sm">
+        <div class="font-display-lg text-display-lg text-on-surface" id="sSessions">–</div>
+        <div class="font-label-bold text-label-bold text-on-surface-variant text-sm">Sessions</div>
+      </div>
+      <div class="bg-surface-container-lowest rounded-xl border-4 border-tertiary-fixed p-4 text-center shadow-sm">
+        <div class="font-display-lg text-display-lg text-on-surface" id="sCompleted">–</div>
+        <div class="font-label-bold text-label-bold text-on-surface-variant text-sm">Done ✅</div>
+      </div>
+      <div class="bg-surface-container-lowest rounded-xl border-4 border-secondary-container p-4 text-center shadow-sm">
+        <div class="font-display-lg text-display-lg text-on-surface" id="sMinutes">–</div>
+        <div class="font-label-bold text-label-bold text-on-surface-variant text-sm">Minutes</div>
+      </div>
+      <div class="bg-surface-container-lowest rounded-xl border-4 border-primary-fixed-dim p-4 text-center shadow-sm">
+        <div class="font-display-lg text-display-lg text-on-surface" id="sSubjects">–</div>
+        <div class="font-label-bold text-label-bold text-on-surface-variant text-sm">Subjects</div>
+      </div>
+    </div>
+
+    <!-- Quick actions -->
+    <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-3">Quick Actions 🚀</h3>
+    <div class="grid grid-cols-2 gap-3">
+      <button onclick="navigate('spin')"
+        class="bubbly-button bg-surface-container-lowest rounded-xl border-4 border-primary-container p-5 flex flex-col items-center gap-2 hover:bg-primary-fixed/20 transition-colors">
+        <span class="material-symbols-outlined text-4xl text-primary"
+          style="font-variation-settings:'FILL' 1">auto_fix_high</span>
+        <span class="font-label-bold text-label-bold text-on-surface">Daily Spin</span>
+      </button>
+      <button onclick="navigate('timer')"
+        class="bubbly-button bg-surface-container-lowest rounded-xl border-4 border-tertiary-fixed p-5 flex flex-col items-center gap-2 hover:bg-tertiary-fixed/30 transition-colors">
+        <span class="material-symbols-outlined text-4xl text-tertiary"
+          style="font-variation-settings:'FILL' 1">timer</span>
+        <span class="font-label-bold text-label-bold text-on-surface">Focus Timer</span>
+      </button>
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════
+     PAGE 2 – MY ADVENTURES (CRUD Sessions)
+══════════════════════════════════════════════════════════ -->
+  <main id="page-sessions"
+    class="page flex-grow w-full max-w-4xl mx-auto px-container-padding py-stack-gap relative z-10">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-headline-lg text-headline-lg text-primary">My Adventures! 🗺️</h2>
+      <button id="addSessionBtn" onclick="openModal()"
+        class="fab bg-primary-container text-on-primary-container font-label-bold text-label-bold px-5 py-3 rounded-full flex items-center gap-2">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">add</span> New
+      </button>
+    </div>
+
+    <!-- Search / filter -->
+    <div class="flex gap-2 mb-4 flex-wrap">
+      <div
+        class="flex items-center bg-surface-container-lowest rounded-full border-2 border-outline-variant px-4 py-2 gap-2 flex-1 min-w-[180px]">
+        <span class="material-symbols-outlined text-on-surface-variant text-xl"
+          style="font-variation-settings:'FILL' 0">search</span>
+        <input id="searchInput" type="text" placeholder="Search sessions…"
+          class="bg-transparent outline-none font-body-md text-body-md text-on-surface w-full placeholder:text-outline"
+          oninput="debounceLoad()" />
+      </div>
+      <select id="filterStatus"
+        class="bg-surface-container-lowest rounded-full border-2 border-outline-variant px-4 py-2 font-label-bold text-label-bold text-on-surface-variant outline-none"
+        onchange="loadSessions()">
+        <option value="">All Status</option>
+        <option>Pending</option>
+        <option>In Progress</option>
+        <option>Completed</option>
+      </select>
+    </div>
+
+    <!-- Session cards grid -->
+    <div id="sessionGrid" class="grid grid-cols-1 md:grid-cols-2 gap-stack-gap"></div>
+    <div id="emptyState" class="hidden text-center py-16">
+      <div class="text-5xl mb-3">📭</div>
+      <p class="font-body-lg text-body-lg text-on-surface-variant">No sessions yet.<br>Add one to start your adventure!
+      </p>
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════
+     PAGE 3 – DAILY SPIN
+══════════════════════════════════════════════════════════ -->
+  <main id="page-spin"
+    class="page flex-grow flex-col items-center justify-center w-full max-w-4xl mx-auto px-container-padding py-8 relative z-10">
+    <div class="text-center mb-8">
+      <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background mb-2">Daily Task Spin! 🎡</h2>
+      <p class="font-body-lg text-body-lg text-on-surface-variant">Spin the wheel to get your next adventure!</p>
+    </div>
+
+    <!-- Wheel -->
+    <div class="relative w-full max-w-[340px] aspect-square flex items-center justify-center mb-10 mx-auto">
+      <div class="wheel-pointer"></div>
+      <div class="wheel-container" id="spinWheel">
+        <div class="segment-text seg-0" id="seg0">Maths</div>
+        <div class="segment-text seg-1" id="seg1">Science</div>
+        <div class="segment-text seg-2" id="seg2">English</div>
+        <div class="segment-text seg-3" id="seg3">History</div>
+        <div class="segment-text seg-4" id="seg4">Art</div>
+        <div class="segment-text seg-5" id="seg5">Programming</div>
+      </div>
+      <!-- Centre hub -->
+      <div
+        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white rounded-full border-4 border-surface-variant shadow-inner z-20 flex items-center justify-center">
+        <span class="material-symbols-outlined text-primary text-3xl"
+          style="font-variation-settings:'FILL' 1">star</span>
+      </div>
+    </div>
+
+    <!-- Spin button -->
+    <div class="flex flex-col items-center gap-4 w-full max-w-xs mx-auto">
+      <button
+        class="bubbly-button bg-primary-container text-on-primary-container font-headline-lg-mobile text-headline-lg-mobile px-12 py-4 rounded-full flex items-center gap-3 w-full justify-center"
+        id="spinBtn">
+        <span>SPIN!</span>
+        <span class="material-symbols-outlined text-3xl" style="font-variation-settings:'FILL' 1">auto_fix_high</span>
+      </button>
+
+      <!-- Result card -->
+      <div
+        class="hidden w-full bg-surface-container-lowest rounded-xl border-4 border-tertiary-fixed-dim shadow-[0_8px_20px_rgba(123,219,133,0.25)] p-6 text-center transition-all duration-300"
+        id="resultCard">
+        <h3 class="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider mb-1">You Got</h3>
+        <p class="font-headline-lg-mobile text-headline-lg-mobile text-tertiary mb-4" id="resultText">Math Fun!</p>
+        <div class="flex gap-2 justify-center">
+          <button id="spinGoBtn"
+            class="bg-tertiary-container text-on-tertiary-container font-label-bold text-label-bold px-6 py-2 rounded-full hover:scale-95 transition-transform flex-1">
+            ➕ Log Session
+          </button>
+          <button onclick="navigate('timer')"
+            class="bg-secondary-fixed text-on-secondary-container font-label-bold text-label-bold px-6 py-2 rounded-full hover:scale-95 transition-transform flex-1">
+            ⏱ Start Timer
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════
+     PAGE 4 – FOCUS TIMER
+══════════════════════════════════════════════════════════ -->
+  <main id="page-timer"
+    class="page flex-grow flex-col items-center justify-center w-full max-w-4xl mx-auto px-container-padding py-8 relative z-10">
+
+    <div
+      class="w-full max-w-md bg-surface-container-lowest rounded-xl shadow-lg border-4 border-surface-variant p-8 flex flex-col items-center relative overflow-hidden">
+      <!-- Blobs -->
+      <div class="absolute -bottom-20 -right-20 w-64 h-64 bg-primary-fixed/20 rounded-full blur-3xl -z-0"></div>
+      <div class="absolute -top-20 -left-20 w-64 h-64 bg-secondary-fixed/20 rounded-full blur-3xl -z-0"></div>
+
+      <!-- Encouragement -->
+      <div class="mb-6 text-center z-10">
+        <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-2" id="timerEncouragement">Ready to
+          Focus! 🌟</h2>
+        <p
+          class="font-body-md text-body-md text-on-surface-variant bg-primary-fixed-dim/20 inline-block px-4 py-1 rounded-full border border-primary-fixed-dim/30">
+          <span id="timerSubjectLabel">Select a subject from spin!</span>
+        </p>
+      </div>
+
+      <!-- Duration presets -->
+      <div class="flex gap-2 mb-6 z-10">
+        <button onclick="setDuration(25)" id="dur25"
+          class="bubbly-button bg-primary-container text-on-primary-container font-label-bold text-label-bold px-4 py-2 rounded-full text-sm">25
+          min</button>
+        <button onclick="setDuration(10)" id="dur10"
+          class="bubbly-button bg-surface-container text-on-surface-variant font-label-bold text-label-bold px-4 py-2 rounded-full text-sm">10
+          min</button>
+        <button onclick="setDuration(45)" id="dur45"
+          class="bubbly-button bg-surface-container text-on-surface-variant font-label-bold text-label-bold px-4 py-2 rounded-full text-sm">45
+          min</button>
+        <button onclick="setDuration(60)" id="dur60"
+          class="bubbly-button bg-surface-container text-on-surface-variant font-label-bold text-label-bold px-4 py-2 rounded-full text-sm">60
+          min</button>
+      </div>
+
+      <!-- Timer circle -->
+      <div class="relative w-72 h-72 mb-8 flex items-center justify-center z-10">
+        <!-- SVG ring -->
+        <svg class="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 300 300">
+          <circle cx="150" cy="150" r="140" fill="none" stroke="#f3f3f3" stroke-width="18" />
+          <circle class="timer-progress" id="timerRing" cx="150" cy="150" r="140" fill="none" stroke="#ffd93d"
+            stroke-linecap="round" stroke-width="18" />
+        </svg>
+        <!-- Inner face -->
+        <div
+          class="absolute inset-0 m-auto w-56 h-56 bg-surface-container-lowest rounded-full shadow-[inset_0_4px_10px_rgba(0,0,0,0.05),0_4px_15px_rgba(255,217,61,0.3)] flex flex-col items-center justify-center border-4 border-surface-container">
+          <span class="font-display-lg text-display-lg text-on-background mb-1" id="timerDisplay">25:00</span>
+          <span class="font-label-bold text-label-bold text-outline uppercase tracking-wider" id="timerMode">Focus
+            Session</span>
+          <div class="flex gap-7 mt-4 opacity-30">
+            <div class="w-3 h-3 bg-on-background rounded-full"></div>
+            <div class="w-3 h-3 bg-on-background rounded-full"></div>
+          </div>
+          <svg class="w-10 h-5 mt-2 opacity-30" viewBox="0 0 50 20">
+            <path d="M5,5 Q25,25 45,5" fill="none" stroke="#1a1c1c" stroke-linecap="round" stroke-width="4" />
+          </svg>
+        </div>
+        <!-- Dots -->
+        <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-5 h-5 bg-primary-container rounded-full shadow-sm">
+        </div>
+        <div class="absolute -bottom-3 left-1/2 -translate-x-1/2 w-5 h-5 bg-primary-container rounded-full shadow-sm">
+        </div>
+        <div class="absolute top-1/2 -left-3 -translate-y-1/2 w-5 h-5 bg-primary-container rounded-full shadow-sm">
+        </div>
+        <div class="absolute top-1/2 -right-3 -translate-y-1/2 w-5 h-5 bg-primary-container rounded-full shadow-sm">
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="flex gap-3 justify-center w-full z-10">
+        <button id="timerResetBtn" onclick="resetTimer()"
+          class="bubbly-button bg-surface-container-high text-on-surface-variant font-label-bold text-label-bold py-3 px-5 rounded-full flex items-center gap-2 border-2 border-surface-variant flex-1">
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">refresh</span> Reset
+        </button>
+        <button id="timerStartBtn" onclick="toggleTimer()"
+          class="bubbly-button bg-primary text-on-primary font-label-bold text-label-bold py-3 px-5 rounded-full flex items-center justify-center gap-2 flex-[1.5]">
+          <span class="material-symbols-outlined" id="timerStartIcon"
+            style="font-variation-settings:'FILL' 1">play_arrow</span>
+          <span id="timerStartText">Start</span>
+        </button>
+        <button id="timerDoneBtn" onclick="completeTimer()"
+          class="bubbly-button bg-tertiary-container text-on-tertiary-container font-label-bold text-label-bold py-3 px-5 rounded-full flex items-center gap-2 border-2 border-tertiary-fixed flex-1">
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">check</span> Done
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════
+     BOTTOM NAV
+══════════════════════════════════════════════════════════ -->
+  <nav
+    class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest shadow-[0_-4px_15px_rgba(0,0,0,0.1)] rounded-t-xl">
+    <div class="flex justify-around items-center px-4 py-3 pb-safe max-w-4xl mx-auto">
+      <button onclick="navigate('home')" id="nav-home"
+        class="nav-item flex flex-col items-center justify-center text-outline p-2 hover:bg-primary-fixed/20 active:scale-95 transition-all duration-150 rounded-xl gap-1">
+        <span class="material-symbols-outlined text-[24px]" style="font-variation-settings:'FILL' 0">home</span>
+        <span class="font-label-bold text-[12px] leading-tight">Home</span>
+      </button>
+      <button onclick="navigate('sessions')" id="nav-sessions"
+        class="nav-item flex flex-col items-center justify-center text-outline p-2 hover:bg-primary-fixed/20 active:scale-95 transition-all duration-150 rounded-xl gap-1">
+        <span class="material-symbols-outlined text-[24px]" style="font-variation-settings:'FILL' 0">assignment</span>
+        <span class="font-label-bold text-[12px] leading-tight">Tasks</span>
+      </button>
+      <button onclick="navigate('spin')" id="nav-spin"
+        class="nav-item flex flex-col items-center justify-center text-outline p-2 hover:bg-primary-fixed/20 active:scale-95 transition-all duration-150 rounded-xl gap-1">
+        <span class="material-symbols-outlined text-[24px]"
+          style="font-variation-settings:'FILL' 0">auto_fix_high</span>
+        <span class="font-label-bold text-[12px] leading-tight">Spin</span>
+      </button>
+      <button onclick="navigate('timer')" id="nav-timer"
+        class="nav-item flex flex-col items-center justify-center text-outline p-2 hover:bg-primary-fixed/20 active:scale-95 transition-all duration-150 rounded-xl gap-1">
+        <span class="material-symbols-outlined text-[24px]" style="font-variation-settings:'FILL' 0">timer</span>
+        <span class="font-label-bold text-[12px] leading-tight">Timer</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════════════════════════════════
+     MODAL – Add / Edit Session
+══════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box">
+      <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-4" id="modalTitle">New Adventure 🗺️
+      </h3>
+      <input type="hidden" id="editId" />
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="font-label-bold text-label-bold text-on-surface-variant block mb-1 text-sm">Subject *</label>
+          <input id="fSubject"
+            class="w-full rounded-full border-2 border-outline-variant bg-surface-container-lowest px-4 py-2.5 font-body-md text-body-md text-on-surface focus:border-primary outline-none transition-all placeholder:text-outline text-base"
+            placeholder="e.g. Maths" />
+        </div>
+        <div>
+          <label class="font-label-bold text-label-bold text-on-surface-variant block mb-1 text-sm">Date *</label>
+          <input id="fDate" type="date"
+            class="w-full rounded-full border-2 border-outline-variant bg-surface-container-lowest px-4 py-2.5 font-body-md text-body-md text-on-surface focus:border-primary outline-none transition-all text-base" />
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="font-label-bold text-label-bold text-on-surface-variant block mb-1 text-sm">Duration
+            (mins)</label>
+          <input id="fDuration" type="number" min="1" value="25"
+            class="w-full rounded-full border-2 border-outline-variant bg-surface-container-lowest px-4 py-2.5 font-body-md text-body-md text-on-surface focus:border-primary outline-none transition-all text-base" />
+        </div>
+        <div>
+          <label class="font-label-bold text-label-bold text-on-surface-variant block mb-1 text-sm">Status</label>
+          <select id="fStatus"
+            class="w-full rounded-full border-2 border-outline-variant bg-surface-container-lowest px-4 py-2.5 font-label-bold text-label-bold text-on-surface focus:border-primary outline-none transition-all text-base">
+            <option>Pending</option>
+            <option>In Progress</option>
+            <option>Completed</option>
+          </select>
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="font-label-bold text-label-bold text-on-surface-variant block mb-1 text-sm">Notes</label>
+        <textarea id="fNotes" rows="2"
+          class="w-full rounded-xl border-2 border-outline-variant bg-surface-container-lowest px-4 py-2.5 font-body-md text-body-md text-on-surface focus:border-primary outline-none transition-all resize-none placeholder:text-outline text-base"
+          placeholder="What will you cover?"></textarea>
+      </div>
+      <div class="flex gap-3 justify-end">
+        <button onclick="closeModal()"
+          class="bubbly-button bg-surface-container text-on-surface-variant font-label-bold text-label-bold px-5 py-2.5 rounded-full border-2 border-surface-variant">Cancel</button>
+        <button onclick="saveSession()"
+          class="bubbly-button bg-primary-container text-on-primary-container font-label-bold text-label-bold px-6 py-2.5 rounded-full">💾
+          Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <script>
+    const API = '/api';
+
+    /* ═══════════════════════════════ NAVIGATION ══════════════════════════════ */
+    let currentPage = 'home';
+    function navigate(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active-nav', 'text-on-primary-container'));
+      document.getElementById('page-' + page).classList.add('active');
+      const navEl = document.getElementById('nav-' + page);
+      if (navEl) navEl.classList.add('active-nav', 'text-on-primary-container');
+      currentPage = page;
+      if (page === 'home') { loadStats(); }
+      if (page === 'sessions') { loadSessions(); }
+      // update header right text
+      const titles = { home: '🏠 Dashboard', sessions: '🗺️ Adventures', spin: '🎡 Daily Spin', timer: '⏱ Focus Timer' };
+      document.getElementById('headerRight').textContent = '';
+    }
+
+    /* ═══════════════════════════════ TOAST ══════════════════════════════════ */
+    function toast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2800);
+    }
+
+    /* ═══════════════════════════════ STATS ══════════════════════════════════ */
+    async function loadStats() {
+      try {
+        const res = await fetch(`${API}/stats`);
+        const d = await res.json();
+        document.getElementById('sSessions').textContent = d.total;
+        document.getElementById('sCompleted').textContent = d.completed;
+        document.getElementById('sMinutes').textContent = d.minutes;
+        document.getElementById('sSubjects').textContent = d.subjects;
+      } catch (e) { console.error(e); }
+    }
+
+    /* ═══════════════════════════════ SESSIONS CRUD ══════════════════════════ */
+    const SUBJ_ICONS = {
+      maths: 'calculate', math: 'calculate', science: 'science', english: 'menu_book',
+      history: 'castle', geography: 'public', programming: 'code', art: 'palette',
+      music: 'music_note', physics: 'bolt', chemistry: 'science', default: 'school'
+    };
+    function getIcon(subj) {
+      const k = subj.toLowerCase().replace(/\s+/g, '');
+      for (const [key, val] of Object.entries(SUBJ_ICONS)) { if (k.includes(key)) return val; }
+      return SUBJ_ICONS.default;
+    }
+    function colorIdx(subj) {
+      const codes = ['maths', 'math', 'science', 'english', 'history', 'geo', 'prog', 'art', 'music'];
+      const k = subj.toLowerCase();
+      const i = codes.findIndex(c => k.includes(c));
+      return i >= 0 ? i % 5 : (subj.charCodeAt(0) % 5);
+    }
+
+    let searchTimer;
+    function debounceLoad() { clearTimeout(searchTimer); searchTimer = setTimeout(loadSessions, 300); }
+
+    async function loadSessions() {
+      const search = document.getElementById('searchInput').value.trim();
+      const status = document.getElementById('filterStatus').value;
+      const params = new URLSearchParams();
+      if (search) params.set('search', search);
+      if (status) params.set('status', status);
+      try {
+        const res = await fetch(`${API}/sessions?${params}`);
+        const rows = await res.json();
+        const grid = document.getElementById('sessionGrid');
+        const empty = document.getElementById('emptyState');
+        grid.innerHTML = '';
+        if (!rows.length) { empty.classList.remove('hidden'); return; }
+        empty.classList.add('hidden');
+        rows.forEach(s => {
+          const ci = colorIdx(s.subject) % 5;
+          const statusKey = s.status.replace(' ', '');
+          const pct = s.status === 'Completed' ? 100 : s.status === 'In Progress' ? 55 : 10;
+          const card = document.createElement('div');
+          card.className = `bubbly-card bg-surface-container-lowest rounded-xl p-5 border-4 border-subj-${ci} relative overflow-hidden group`;
+          card.innerHTML = `
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-14 h-14 rounded-full icon-subj-${ci} flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-3xl" style="font-variation-settings:'FILL' 1">${getIcon(s.subject)}</span>
+            </div>
+            <div>
+              <span class="chip-${statusKey} inline-block px-3 py-0.5 font-label-bold text-sm rounded-full mb-1">${s.status}</span>
+              <h3 class="font-body-lg text-body-lg text-on-surface font-bold leading-tight">${s.subject}</h3>
+              <p class="text-on-surface-variant text-sm">⏱ ${s.duration} min · 📅 ${s.date}</p>
+            </div>
+          </div>
+          <div class="flex flex-col gap-1.5 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+            <button onclick="editSession(${s.id})" class="p-2 bg-primary-container text-on-primary-container rounded-full hover:scale-105 active:scale-95 transition-all" title="Edit">
+              <span class="material-symbols-outlined text-xl">edit</span>
+            </button>
+            <button onclick="deleteSession(${s.id})" class="p-2 bg-error-container text-on-error-container rounded-full hover:scale-105 active:scale-95 transition-all" title="Delete">
+              <span class="material-symbols-outlined text-xl">delete</span>
+            </button>
+          </div>
+        </div>
+        ${s.notes ? `<p class="mt-2 text-on-surface-variant text-sm line-clamp-2">${s.notes}</p>` : ''}
+        <div class="prog-bar mt-3">
+          <div class="prog-fill prog-subj-${ci}" style="width:${pct}%"></div>
+        </div>`;
+          grid.appendChild(card);
+        });
+      } catch (e) { toast('❌ Cannot connect to server'); }
+    }
+
+    /* ─── Modal ─── */
+    function openModal(session = null) {
+      document.getElementById('modalTitle').textContent = session ? 'Edit Adventure ✏️' : 'New Adventure 🗺️';
+      document.getElementById('editId').value = session ? session.id : '';
+      document.getElementById('fSubject').value = session ? session.subject : '';
+      document.getElementById('fDate').value = session ? session.date : new Date().toISOString().split('T')[0];
+      document.getElementById('fDuration').value = session ? session.duration : 25;
+      document.getElementById('fStatus').value = session ? session.status : 'Pending';
+      document.getElementById('fNotes').value = session ? session.notes : '';
+      document.getElementById('modalOverlay').classList.add('open');
+    }
+    function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+    document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+    async function saveSession() {
+      const id = document.getElementById('editId').value;
+      const subject = document.getElementById('fSubject').value.trim();
+      const date = document.getElementById('fDate').value;
+      const duration = parseInt(document.getElementById('fDuration').value) || 25;
+      const status = document.getElementById('fStatus').value;
+      const notes = document.getElementById('fNotes').value.trim();
+      if (!subject || !date) { toast('⚠️ Subject and date are required!'); return; }
+      const body = { subject, date, duration, status, notes };
+      try {
+        const res = await fetch(id ? `${API}/sessions/${id}` : `${API}/sessions`, {
+          method: id ? 'PUT' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        if (res.ok) {
+          closeModal(); loadSessions(); loadStats();
+          toast(id ? '✅ Session updated!' : '🎉 Session added!');
+        } else {
+          const err = await res.json();
+          toast('❌ ' + (err.error || 'Error saving'));
+        }
+      } catch (e) { toast('❌ Cannot connect to server'); }
+    }
+
+    async function editSession(id) {
+      try {
+        const res = await fetch(`${API}/sessions/${id}`);
+        if (res.ok) openModal(await res.json());
+      } catch (e) { toast('❌ Cannot connect to server'); }
+    }
+
+    async function deleteSession(id) {
+      if (!confirm('Delete this adventure?')) return;
+      try {
+        const res = await fetch(`${API}/sessions/${id}`, { method: 'DELETE' });
+        if (res.ok) { loadSessions(); loadStats(); toast('🗑️ Session deleted!'); }
+        else { const e = await res.json(); toast('❌ ' + (e.error || 'Delete failed')); }
+      } catch (e) { toast('❌ Cannot connect to server'); }
+    }
+
+    /* ═══════════════════════════════ SPIN WHEEL ═════════════════════════════ */
+    const WHEEL_SUBJECTS = ['Maths', 'Science', 'English', 'History', 'Art', 'Programming'];
+    let currentRotation = 0;
+    let spinResult = '';
+
+    document.getElementById('spinBtn').addEventListener('click', () => {
+      const btn = document.getElementById('spinBtn');
+      const wheel = document.getElementById('spinWheel');
+      const card = document.getElementById('resultCard');
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+      card.classList.add('hidden');
+      wheel.classList.add('spinning');
+      const extraSpins = 4 * 360 + Math.floor(Math.random() * 360);
+      const totalRot = currentRotation + extraSpins;
+      wheel.style.transition = 'transform 3s cubic-bezier(0.25,0.1,0.25,1)';
+      wheel.style.transform = `rotate(${totalRot}deg)`;
+      setTimeout(() => {
+        wheel.classList.remove('spinning');
+        const segSize = 360 / WHEEL_SUBJECTS.length;
+        const finalAngle = totalRot % 360;
+        const idx = Math.floor((360 - (finalAngle % 360) + segSize / 2) % 360 / segSize) % WHEEL_SUBJECTS.length;
+        spinResult = WHEEL_SUBJECTS[idx];
+        document.getElementById('resultText').textContent = spinResult + '!';
+        card.classList.remove('hidden');
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        currentRotation = totalRot;
+        // also set timer subject label
+        document.getElementById('timerSubjectLabel').textContent = spinResult + ' Session';
+      }, 3050);
+    });
+
+    document.getElementById('spinGoBtn').addEventListener('click', () => {
+      openModal();
+      document.getElementById('fSubject').value = spinResult;
+      navigate('sessions');
+    });
+
+    /* ═══════════════════════════════ FOCUS TIMER ════════════════════════════ */
+    let timerDuration = 25 * 60; // seconds
+    let timerRemaining = timerDuration;
+    let timerRunning = false;
+    let timerInterval = null;
+    const CIRCUMFERENCE = 2 * Math.PI * 140; // ≈ 879.6
+
+    function setDuration(mins) {
+      if (timerRunning) return;
+      timerDuration = mins * 60;
+      timerRemaining = timerDuration;
+      updateTimerDisplay();
+      document.querySelectorAll('[id^="dur"]').forEach(b => {
+        b.className = 'bubbly-button bg-surface-container text-on-surface-variant font-label-bold text-label-bold px-4 py-2 rounded-full text-sm';
+      });
+      document.getElementById('dur' + mins).className = 'bubbly-button bg-primary-container text-on-primary-container font-label-bold text-label-bold px-4 py-2 rounded-full text-sm';
+    }
+
+    function updateTimerDisplay() {
+      const m = Math.floor(timerRemaining / 60).toString().padStart(2, '0');
+      const s = (timerRemaining % 60).toString().padStart(2, '0');
+      document.getElementById('timerDisplay').textContent = `${m}:${s}`;
+      const pct = timerRemaining / timerDuration;
+      const offset = CIRCUMFERENCE * (1 - pct);
+      document.getElementById('timerRing').style.strokeDashoffset = offset;
+      // ring color changes as time runs out
+      const color = pct > 0.5 ? '#ffd93d' : pct > 0.2 ? '#4c96fe' : '#ba1a1a';
+      document.getElementById('timerRing').setAttribute('stroke', color);
+    }
+
+    function toggleTimer() {
+      if (timerRunning) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        document.getElementById('timerStartIcon').textContent = 'play_arrow';
+        document.getElementById('timerStartText').textContent = 'Resume';
+        document.getElementById('timerEncouragement').textContent = 'Take a breather! 😮‍💨';
+      } else {
+        if (timerRemaining <= 0) resetTimer();
+        timerRunning = true;
+        document.getElementById('timerStartIcon').textContent = 'pause';
+        document.getElementById('timerStartText').textContent = 'Pause';
+        document.getElementById('timerEncouragement').textContent = "You're doing great! 🌟";
+        timerInterval = setInterval(() => {
+          timerRemaining--;
+          updateTimerDisplay();
+          if (timerRemaining <= 0) {
+            clearInterval(timerInterval);
+            timerRunning = false;
+            document.getElementById('timerStartIcon').textContent = 'play_arrow';
+            document.getElementById('timerStartText').textContent = 'Start';
+            document.getElementById('timerEncouragement').textContent = "Time's up! Amazing work! 🏆";
+            toast('⏰ Session complete! Great job!');
+          }
+        }, 1000);
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      timerRemaining = timerDuration;
+      document.getElementById('timerStartIcon').textContent = 'play_arrow';
+      document.getElementById('timerStartText').textContent = 'Start';
+      document.getElementById('timerEncouragement').textContent = 'Ready to Focus! 🌟';
+      updateTimerDisplay();
+    }
+
+    function completeTimer() {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      const spent = Math.floor((timerDuration - timerRemaining) / 60) || 1;
+      const subj = spinResult || 'Study';
+      resetTimer();
+      // auto-open modal with prefilled data
+      navigate('sessions');
+      setTimeout(() => {
+        openModal();
+        document.getElementById('fSubject').value = subj;
+        document.getElementById('fDuration').value = spent || Math.floor(timerDuration / 60);
+        document.getElementById('fStatus').value = 'Completed';
+        document.getElementById('fNotes').value = `Completed a ${Math.floor(timerDuration / 60)}-minute focus session.`;
+      }, 100);
+      toast('🎉 Well done! Logging your session…');
+    }
+
+    /* ═══════════════════════════════ INIT ═══════════════════════════════════ */
+    updateTimerDisplay();
+    navigate('home');
+    loadStats();
+  </script>
+</body>
+
+</html>
