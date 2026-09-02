@@ -186,7 +186,7 @@ resource "aws_instance" "app" {
     aws_security_group.ec2.id
   ]
 
-  key_name = var.key_name
+  key_name = "ec2-user"
 
   user_data = file("${path.module}/userdata.sh")
 
