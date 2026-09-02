@@ -20,5 +20,11 @@ jobs:
           password: ${{ secrets.docker_password }}
       - name: Checking Docker Login
         run: docker info
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if docker image exists
+        run: docker images
       
      
