@@ -1,1 +1,15 @@
 .dockerignore
+backend.tf
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+
+# SSH private keys
+*.pem
+
+# Terraform variables containing secrets
+*.tfvars
+*.tfvars.json
